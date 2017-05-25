@@ -1,4 +1,4 @@
-function [ sealCount, crack_Im, seals_Im ] = ProjectWeddell( path, width )
+function [ sealCount, crack_Im, seals_Im ] = ProjectWeddell( path, width, probabilityThreshold )
     % INPUT
     % path is a path (absolute or real) to the image to analyze
     % Width is the width in pixels around the tide-cracks in crack_Im
@@ -27,15 +27,15 @@ function [ sealCount, crack_Im, seals_Im ] = ProjectWeddell( path, width )
     I = imread(path);
     I = im2double(I);
     
-    crack = getCrack(I);
-    crackMask = getCrackMask(crack, width);
+    crack = getCrack(I, resolution);
+    crackMask = getCrackMask(crack, width, resolution);
     %crack_Im = applyCrackMask(crackMask, I);
-    seals_Im = blobDetector(I, .8);
+    seals_Im = blobDetector(I, .8, resolution);
     %binaryImage = imfill(binaryImage, 'holes');
    
     
     CC = bwconncomp(seals_Im, 4);
-    prob = Likelihood(CC, crack);
+    prob = Likelihood(CC, crack, probabilityThreshold);
 
     sealCount = CC.NumObjects;
 
